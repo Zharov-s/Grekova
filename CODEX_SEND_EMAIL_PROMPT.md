@@ -26,7 +26,7 @@
 ```text
 From: ABCENTRUM <s.zharov@abcentrum.ru>
 To: s.zharov@abcentrum.ru
-Cc: пусто / не используется
+Cc: s.zharov@abcentrum.ru
 Bcc: все валидные адреса из списка пользователя
 Reply-To: s.zharov@abcentrum.ru
 ```
@@ -35,15 +35,15 @@ Reply-To: s.zharov@abcentrum.ru
 
 1. Отправляй письмо с почты `s.zharov@abcentrum.ru`.
 2. В поле `To` всегда ставь только один адрес: `s.zharov@abcentrum.ru`.
-3. `Cc` не используй.
+3. В поле `Cc` всегда ставь только один адрес: `s.zharov@abcentrum.ru`.
 4. Все адреса из списка пользователя ставь только в `Bcc` / скрытую копию.
 5. Получатели не должны видеть адреса друг друга.
 6. Если SMTP / провайдер ограничивает количество адресов в `Bcc`, дели рассылку на батчи. В каждом батче:
    - `From`: `ABCENTRUM <s.zharov@abcentrum.ru>`;
    - `To`: `s.zharov@abcentrum.ru`;
-   - `Cc`: пусто / не используется;
+   - `Cc`: `s.zharov@abcentrum.ru`;
    - `Bcc`: часть списка получателей.
-7. Не отправляй адреса пользователя индивидуально в `To` или `Cc`, даже если так проще технически.
+7. Не отправляй адреса пользователя индивидуально в `To`, даже если так проще технически.
 
 ---
 
@@ -201,6 +201,7 @@ https://t.me/abcentrum_dev
    - `SMTP_PASS`;
    - `EMAIL_FROM`;
    - `EMAIL_TO`;
+   - `EMAIL_CC`;
    - `EMAIL_REPLY_TO`;
    - `ASSET_BASE_URL`;
    - `UNSUBSCRIBE_URL`.
@@ -215,7 +216,7 @@ https://t.me/abcentrum_dev
 ```text
 From: ABCENTRUM <s.zharov@abcentrum.ru>
 To: s.zharov@abcentrum.ru
-Cc: пусто / не используется
+Cc: s.zharov@abcentrum.ru
 Bcc: валидные адреса получателей
 Reply-To: s.zharov@abcentrum.ru
 ```
@@ -233,8 +234,8 @@ Reply-To: s.zharov@abcentrum.ru
 ```text
 From: ABCENTRUM <s.zharov@abcentrum.ru>
 To: s.zharov@abcentrum.ru
-Cc: пусто / не используется
-Bcc: пусто
+Cc: s.zharov@abcentrum.ru
+Bcc: тестовый адрес (если указан пользователем)
 ```
 
 Основную рассылку отправляй только после отдельной команды пользователя.
