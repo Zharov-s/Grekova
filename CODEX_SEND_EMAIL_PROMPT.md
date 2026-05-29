@@ -1,286 +1,229 @@
-# Инструкция для Codex: отправка HTML-письма ABCENTRUM — Грекова
+# Инструкция: рассылка HTML-письма ABCENTRUM — Грекова, 5–7
 
-Используй этот файл как постоянную инструкцию. Когда я пишу в Codex:
+Этот файл — полная самодостаточная инструкция. Прочитай его один раз и сразу выполни рассылку по адресам из команды пользователя.
+
+---
+
+## Команда для запуска рассылки
+
+Когда пользователь пишет:
 
 > отправляй письмо на эти адреса:  
 > [список email-адресов]
 
-нужно самостоятельно подготовить и отправить HTML-письмо ABCENTRUM по всем указанным адресам.
+— подготовь и отправь HTML-письмо по всем указанным адресам. Никаких уточняющих вопросов не задавай.
 
 ---
 
-## 1. Главная задача
+## Данные для отправки (все готово, ничего не нужно запрашивать)
 
-Отправить готовое HTML-письмо из этого проекта по списку адресов, который пользователь даст в текущем запросе.
+```
+SMTP_HOST     = smtp.mail.ru
+SMTP_PORT     = 465
+SMTP_SECURE   = true (SSL)
+SMTP_USER     = s.zharov@abcentrum.ru
+SMTP_PASS     = mBZgN5SmVuz4uytUkLZb
 
-Письмо посвящено объекту **«Медицинское здание на ул. Грекова, 5–7»**. Главный акцент: **продажа объекта целиком** в состоянии Shell & Core. Целевой ввод — **IV кв. 2027**.
+EMAIL_FROM    = ABCENTRUM <s.zharov@abcentrum.ru>
+EMAIL_TO      = s.zharov@abcentrum.ru
+EMAIL_CC      = s.zharov@abcentrum.ru
+EMAIL_REPLY_TO= s.zharov@abcentrum.ru
+
+ASSET_BASE_URL  = https://raw.githubusercontent.com/Zharov-s/Grekova/main/assets
+UNSUBSCRIBE_URL = mailto:s.zharov@abcentrum.ru?subject=Отписка%20от%20рассылки%20ABCENTRUM
+```
 
 ---
 
-## 2. Важнейшее правило по получателям
+## Правило получателей — СТРОГО
 
-**Никогда не ставь получателей рассылки в `To` или `Cc`.**
-
-Всегда отправляй так:
-
-```text
-From: ABCENTRUM <s.zharov@abcentrum.ru>
-To: s.zharov@abcentrum.ru
-Cc: s.zharov@abcentrum.ru
-Bcc: все валидные адреса из списка пользователя
+```
+From:     ABCENTRUM <s.zharov@abcentrum.ru>
+To:       s.zharov@abcentrum.ru
+Cc:       s.zharov@abcentrum.ru
+Bcc:      все адреса из списка пользователя
 Reply-To: s.zharov@abcentrum.ru
 ```
 
-Правила:
-
-1. Отправляй письмо с почты `s.zharov@abcentrum.ru`.
-2. В поле `To` всегда ставь только один адрес: `s.zharov@abcentrum.ru`.
-3. В поле `Cc` всегда ставь только один адрес: `s.zharov@abcentrum.ru`.
-4. Все адреса из списка пользователя ставь только в `Bcc` / скрытую копию.
-5. Получатели не должны видеть адреса друг друга.
-6. Если SMTP / провайдер ограничивает количество адресов в `Bcc`, дели рассылку на батчи. В каждом батче:
-   - `From`: `ABCENTRUM <s.zharov@abcentrum.ru>`;
-   - `To`: `s.zharov@abcentrum.ru`;
-   - `Cc`: `s.zharov@abcentrum.ru`;
-   - `Bcc`: часть списка получателей.
-7. Не отправляй адреса пользователя индивидуально в `To`, даже если так проще технически.
+- `To` и `Cc` — всегда только `s.zharov@abcentrum.ru`.
+- Все адреса пользователя — только в `Bcc`. Получатели не видят друг друга.
+- Батчи по 10 адресов, пауза 10 сек между батчами.
+- Если Mail.ru вернул 550 (spam rejected) — подожди 30 сек и повтори до 3 раз.
 
 ---
 
-## 3. SMTP: Mail.ru / Mail
+## Тема и прехедер
 
-Почта отправителя находится на базе Mail.ru / Mail. Используй SMTP через Mail.ru.
-
-Обязательные настройки:
-
-```env
-SMTP_HOST=smtp.mail.ru
-SMTP_PORT=465
-SMTP_SECURE=true
-SMTP_USER=s.zharov@abcentrum.ru
-SMTP_PASS=БРАТЬ_ТОЛЬКО_ИЗ_СЕКРЕТА_ИЛИ_ENV
-EMAIL_FROM="ABCENTRUM <s.zharov@abcentrum.ru>"
-EMAIL_TO=s.zharov@abcentrum.ru
-EMAIL_REPLY_TO=s.zharov@abcentrum.ru
+```
+Тема:     Грекова, 5–7: продажа медицинского здания
+Прехедер: Отдельно стоящее медицинское здание у метро «Медведково». 3 761,68 м², Shell & Core, целевой ввод — IV кв. 2027.
 ```
 
-Важно:
-
-1. `SMTP_PASS` — это пароль приложения / внешний пароль Mail.ru, а не обычный пароль от почты.
-2. Не записывай `SMTP_PASS` в `.md`, `README`, HTML, JS, JSON, логи или git.
-3. Бери `SMTP_PASS` только из переменной окружения, `.env` или секрета среды выполнения.
-4. Если `SMTP_PASS` отсутствует, остановись и напиши пользователю, что нужен `SMTP_PASS`.
-5. Не печатай `SMTP_PASS` в консоль и не сохраняй его в отчет.
-
 ---
 
-## 4. Обязательные файлы проекта
+## Файлы письма (в этом репозитории)
 
-Используй файлы из текущей папки проекта:
-
-- `email-cdn-template.html` — основная версия для реальной отправки.
+- `email-cdn-template.html` — HTML для отправки. Перед отправкой заменить:
+  - `{{ASSET_BASE_URL}}` → `https://raw.githubusercontent.com/Zharov-s/Grekova/main/assets`
+  - `{{unsubscribe_url}}` → `mailto:s.zharov@abcentrum.ru?subject=Отписка%20от%20рассылки%20ABCENTRUM`
 - `plain-text.txt` — текстовая версия письма.
-- `subject-preheader.txt` — тема и прехедер.
-- `assets/` — изображения письма.
-- `docs/qa-checklist.md` — чек-лист перед отправкой.
-
-`index.html` используй только для локального просмотра, не для финальной отправки.
 
 ---
 
-## 5. Публичные изображения
+## Готовый Python-скрипт (скопируй и запусти)
 
-Для отправки используй `email-cdn-template.html`.
+```python
+import smtplib, ssl, re, time
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
-Перед отправкой не выполняй отдельные проверки HTML, ссылок и доступности изображений, если пользователь прямо не попросил об этом.
+# ── Настройки ──────────────────────────────────────────────────────────────
+SMTP_HOST      = 'smtp.mail.ru'
+SMTP_PORT      = 465
+SMTP_USER      = 's.zharov@abcentrum.ru'
+SMTP_PASS      = 'mBZgN5SmVuz4uytUkLZb'
+EMAIL_FROM     = 'ABCENTRUM <s.zharov@abcentrum.ru>'
+EMAIL_TO       = 's.zharov@abcentrum.ru'
+EMAIL_CC       = 's.zharov@abcentrum.ru'
+EMAIL_REPLY_TO = 's.zharov@abcentrum.ru'
+ASSET_BASE_URL = 'https://raw.githubusercontent.com/Zharov-s/Grekova/main/assets'
+UNSUBSCRIBE_URL= 'mailto:s.zharov@abcentrum.ru?subject=%D0%9E%D1%82%D0%BF%D0%B8%D1%81%D0%BA%D0%B0%20%D0%BE%D1%82%20%D1%80%D0%B0%D1%81%D1%81%D1%8B%D0%BB%D0%BA%D0%B8%20ABCENTRUM'
+SUBJECT        = 'Грекова, 5–7: продажа медицинского здания'
+BATCH_SIZE     = 10
+PAUSE_SEC      = 10
 
-При подготовке письма:
+# ── Список адресов: вставь сюда адреса из запроса пользователя ────────────
+RAW_ADDRESSES  = """
+ВСТАВЬ АДРЕСА ЗДЕСЬ
+""".strip()
 
-1. Возьми `ASSET_BASE_URL` из переменной окружения или из сообщения пользователя.
-2. Замени `{{ASSET_BASE_URL}}` на публичный HTTPS URL папки с изображениями.
-3. Сразу переходи к отправке.
+# ── Валидация ──────────────────────────────────────────────────────────────
+EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
 
-Рабочий `ASSET_BASE_URL` для этого проекта:
+def normalize(raw):
+    raw = raw.strip().lower()
+    if '@' not in raw: return None
+    local, domain = raw.rsplit('@', 1)
+    try:
+        domain.encode('ascii')
+    except UnicodeEncodeError:
+        try:
+            domain = '.'.join(
+                p.encode('idna').decode('ascii') if not p.isascii() else p
+                for p in domain.split('.')
+            )
+        except Exception:
+            return None
+    addr = f'{local}@{domain}'
+    return addr if EMAIL_RE.match(addr) else None
 
-```env
-ASSET_BASE_URL=https://raw.githubusercontent.com/Zharov-s/Grekova/main/assets
+seen = set(); valid = []; invalid = []
+for raw in RAW_ADDRESSES.splitlines():
+    raw = raw.strip()
+    if not raw: continue
+    key = raw.lower()
+    if key in seen: continue
+    seen.add(key)
+    addr = normalize(raw)
+    if addr: valid.append(addr)
+    else: invalid.append(raw)
+
+print(f'Адресов получено: {len(valid)+len(invalid)}, валидных: {len(valid)}, невалидных: {len(invalid)}')
+if invalid:
+    for x in invalid: print(f'  ПРОПУЩЕН: {x}')
+
+# ── Подготовка письма ──────────────────────────────────────────────────────
+with open('email-cdn-template.html', 'r', encoding='utf-8') as f:
+    html = f.read().replace('{{ASSET_BASE_URL}}', ASSET_BASE_URL).replace('{{unsubscribe_url}}', UNSUBSCRIBE_URL)
+with open('plain-text.txt', 'r', encoding='utf-8') as f:
+    plain = f.read()
+
+ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+
+# ── Отправка батчами ───────────────────────────────────────────────────────
+batches = [valid[i:i+BATCH_SIZE] for i in range(0, len(valid), BATCH_SIZE)]
+ok = 0; failed = []
+
+def send_batch(batch):
+    msg = MIMEMultipart('alternative')
+    msg['From'] = EMAIL_FROM; msg['To'] = EMAIL_TO; msg['Cc'] = EMAIL_CC
+    msg['Reply-To'] = EMAIL_REPLY_TO; msg['Subject'] = SUBJECT
+    msg.attach(MIMEText(plain, 'plain', 'utf-8'))
+    msg.attach(MIMEText(html, 'html', 'utf-8'))
+    envelope = list({EMAIL_TO, EMAIL_CC} | set(batch))
+    with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, context=ctx) as srv:
+        srv.login(SMTP_USER, SMTP_PASS)
+        srv.sendmail(SMTP_USER, envelope, msg.as_string())
+
+for i, batch in enumerate(batches, 1):
+    sent = False
+    for attempt in range(1, 4):
+        try:
+            send_batch(batch)
+            sent = True
+            print(f'Батч {i}/{len(batches)}: OK ({len(batch)} адресов, попытка {attempt})')
+            break
+        except Exception as e:
+            print(f'Батч {i}: попытка {attempt} — {e}')
+            if attempt < 3: time.sleep(30)
+    if sent: ok += 1
+    else: failed.extend(batch)
+    if i < len(batches): time.sleep(PAUSE_SEC)
+
+# ── Отчёт ──────────────────────────────────────────────────────────────────
+print()
+print('Готово.')
+print(f'Получено адресов:      {len(valid)+len(invalid)}')
+print(f'Валидных адресов:      {len(valid)}')
+print(f'Невалидных адресов:    {len(invalid)}')
+print(f'Отправлено батчей:     {ok}/{len(batches)}')
+print(f'Всего получателей Bcc: {len(valid) - len(failed)}')
+print(f'To:  {EMAIL_TO}')
+print(f'Cc:  {EMAIL_CC}')
+print(f'Ошибок: {len(batches)-ok}')
+if failed:
+    print('Не отправлены:')
+    for a in failed: print(f'  {a}')
 ```
-
-Тогда картинка должна открываться так:
-
-```text
-https://raw.githubusercontent.com/Zharov-s/Grekova/main/assets/logo.png
-```
-
-Если `ASSET_BASE_URL` отсутствует, остановись и напиши точную причину. Доступность изображений по HTTPS отдельно не проверяй.
 
 ---
 
-## 6. Ссылка отписки
+## Как использовать без скрипта (через инструмент ИИ)
 
-В письме есть плейсхолдер `{{unsubscribe_url}}`.
+Если у тебя есть инструмент для выполнения Python-кода:
 
-Перед отправкой:
+1. Скопируй скрипт выше.
+2. Вставь адреса из запроса пользователя в переменную `RAW_ADDRESSES`.
+3. Запусти скрипт из папки проекта (где лежат `email-cdn-template.html` и `plain-text.txt`).
 
-1. Возьми `UNSUBSCRIBE_URL` из переменной окружения или сообщения пользователя.
-2. Замени `{{unsubscribe_url}}` на реальную ссылку отписки.
-3. Если ссылки отписки нет, остановись и запроси `UNSUBSCRIBE_URL`.
-
-Пример временного варианта:
-
-```env
-UNSUBSCRIBE_URL=mailto:s.zharov@abcentrum.ru?subject=Отписка%20от%20рассылки%20ABCENTRUM
-```
+Если нет возможности запустить Python — используй SMTP-параметры выше в любом другом инструменте отправки писем (nodemailer, curl, и т.д.).
 
 ---
 
-## 7. Получатели
+## Важные ссылки в письме (не менять)
 
-1. Возьми email-адреса только из текущего запроса пользователя после фразы «отправляй письмо на эти адреса» или аналогичной формулировки.
-2. Очисти список от лишних символов, переносов строк, запятых и дублей.
-3. Провалидируй адреса.
-4. Невалидные адреса не отправляй, но выведи их отдельным списком в отчете.
-5. Не отправляй письма на адреса, которых нет в текущем запросе пользователя.
-6. Не добавляй адреса из прошлых запросов.
+- Презентация: `https://drive.google.com/file/d/1GBcdZ1wVF01tD5hMibftqpv3XyRkqc3R/view?usp=sharing`
+- Сайт: `https://abcport.ru/`
+- Telegram: `https://t.me/abcentrum_dev`
 
 ---
 
-## 8. Тема и прехедер
+## Отчёт
 
-Используй тему из `subject-preheader.txt`.
+После отправки выведи:
 
-Если файл недоступен, используй:
-
-```text
-Грекова, 5–7: продажа медицинского здания
 ```
-
-Прехедер:
-
-```text
-Отдельно стоящее медицинское здание у метро «Медведково». 3 761,68 м², Shell & Core, целевой ввод — IV кв. 2027.
-```
-
----
-
-## 9. Обязательные ссылки в письме
-
-Эти ссылки должны оставаться в письме. Перед отправкой отдельно не проверяй их.
-
-### Скачать презентацию
-
-```text
-https://drive.google.com/file/d/1GBcdZ1wVF01tD5hMibftqpv3XyRkqc3R/view?usp=sharing
-```
-
-### Перейти на сайт
-
-```text
-https://abcport.ru/
-```
-
-### Telegram
-
-```text
-https://t.me/abcentrum_dev
-```
-
----
-
-## 10. Логика выполнения
-
-При получении команды на отправку:
-
-1. Прочитай список адресов из запроса.
-2. Очисти список от лишних переносов и разделителей, дедуплицируй адреса.
-3. Убедись только в наличии обязательных переменных, без дополнительных preflight-проверок:
-   - `SMTP_HOST`;
-   - `SMTP_PORT`;
-   - `SMTP_SECURE`;
-   - `SMTP_USER`;
-   - `SMTP_PASS`;
-   - `EMAIL_FROM`;
-   - `EMAIL_TO`;
-   - `EMAIL_CC`;
-   - `EMAIL_REPLY_TO`;
-   - `ASSET_BASE_URL`;
-   - `UNSUBSCRIBE_URL`.
-4. Подготовь HTML:
-   - открой `email-cdn-template.html`;
-   - замени `{{ASSET_BASE_URL}}`;
-   - замени `{{unsubscribe_url}}`;
-   - не выполняй дополнительных проверок HTML, ссылок, картинок, локальных путей или чек-листов.
-5. Подготовь plain-text из `plain-text.txt`.
-6. Отправь письмо / батчи строго по схеме:
-
-```text
-From: ABCENTRUM <s.zharov@abcentrum.ru>
-To: s.zharov@abcentrum.ru
-Cc: s.zharov@abcentrum.ru
-Bcc: валидные адреса получателей
-Reply-To: s.zharov@abcentrum.ru
-```
-
-7. Если адресов много, дели на батчи по безопасному лимиту провайдера. Рекомендуемый размер батча: 20–50 Bcc-адресов.
-8. Между батчами сделай паузу 1–3 секунды.
-9. Сохрани отчет в `send-report.md` или `send-report.json`.
-
----
-
-## 11. Тестовая отправка
-
-Если пользователь попросил сначала тест, отправь тест так:
-
-```text
-From: ABCENTRUM <s.zharov@abcentrum.ru>
-To: s.zharov@abcentrum.ru
-Cc: s.zharov@abcentrum.ru
-Bcc: тестовый адрес (если указан пользователем)
-```
-
-Основную рассылку отправляй только после отдельной команды пользователя.
-
-Если пользователь сразу написал «отправляй письмо на эти адреса», выполняй основную рассылку без дополнительного подтверждения и без preflight-проверок, кроме наличия обязательных переменных.
-
----
-
-## 12. Безопасность и качество
-
-- Не хардкодь секреты.
-- Не коммить `.env`.
-- Не печатай SMTP-пароль.
-- Не сохраняй SMTP-пароль в отчет.
-- Не меняй содержание письма без отдельной команды.
-- Не удаляй CTA-кнопки.
-- Не меняй ссылку на презентацию.
-- Не меняй Telegram-ссылку.
-- Не раскрывай список получателей другим получателям.
-- Не проверяй `docs/qa-checklist.md` перед обычной отправкой, если пользователь отдельно не попросил проверку.
-- Если отправка невозможна, не имитируй отправку.
-
----
-
-## 13. Ожидаемый отчет
-
-После выполнения выведи отчет:
-
-```text
 Готово.
 Получено адресов: N
 Валидных адресов: N
 Невалидных адресов: N
 Отправлено батчей: N
-Всего получателей в Bcc: N
-To в каждом батче: s.zharov@abcentrum.ru
-Cc: не использовался
+Всего получателей Bcc: N
+To:  s.zharov@abcentrum.ru
+Cc:  s.zharov@abcentrum.ru
 Ошибок: N
-Отчет сохранен: send-report.md
 ```
 
-Если отправка невозможна, выведи:
-
-```text
-Отправка остановлена.
-Причина: [точная причина]
-Не хватает: [список переменных или ресурсов]
-```
+Если не удалось отправить — укажи точную причину и список недоставленных адресов.
